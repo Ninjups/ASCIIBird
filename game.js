@@ -10,9 +10,9 @@ class ASCIIBird {
         
         // Load sound effects
         this.sounds = {
-            flap: new Audio('sounds/jump.wav'),
-            score: new Audio('sounds/pickupCoin.wav'),
-            gameOver: new Audio('sounds/synth.wav')
+            flap: new Audio('Sounds/jump.wav'),
+            score: new Audio('Sounds/pickupCoin.wav'),
+            gameOver: new Audio('Sounds/synth.wav')
         };
         
         // Adjust sound volumes
