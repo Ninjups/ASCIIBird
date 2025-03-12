@@ -7,6 +7,10 @@ class ASCIIBird {
         this.finalScoreDisplay = document.getElementById('final-score');
         this.startScreen = document.getElementById('start-screen');
         this.gameOverScreen = document.getElementById('game-over-screen');
+        this.soundStatus = document.getElementById('sound-status');
+        
+        // Audio context setup
+        this.audioInitialized = false;
         
         // Load sound effects
         this.sounds = {
@@ -19,6 +23,11 @@ class ASCIIBird {
         this.sounds.flap.volume = 0.5;
         this.sounds.score.volume = 0.5;
         this.sounds.gameOver.volume = 0.6; // Slightly louder for impact
+        
+        // Preload sounds
+        Object.values(this.sounds).forEach(sound => {
+            sound.load();
+        });
         
         // Game state
         this.isGameRunning = false;
@@ -98,6 +107,11 @@ class ASCIIBird {
     }
     
     startGame() {
+        // Initialize audio on first user interaction
+        if (!this.audioInitialized) {
+            this.initializeAudio();
+        }
+        
         this.isGameRunning = true;
         this.score = 0;
         this.scoreDisplay.textContent = `Score: ${this.score}`;
@@ -421,9 +435,55 @@ class ASCIIBird {
         requestAnimationFrame(this.gameLoop.bind(this));
     }
     
+    // Initialize audio - helps with browser autoplay policies
+    initializeAudio() {
+        this.audioInitialized = true;
+        
+        // Play and immediately pause all sounds to initialize them
+        Object.values(this.sounds).forEach(sound => {
+            const playPromise = sound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    sound.pause();
+                    sound.currentTime = 0;
+                    console.log('Audio successfully initialized');
+                    // Update sound status indicator
+                    this.soundStatus.classList.remove('sound-off');
+                    this.soundStatus.classList.add('sound-on');
+                }).catch(error => {
+                    console.error('Audio initialization failed:', error);
+                });
+            }
+        });
+        
+        // Add click handler for sound toggle
+        this.soundStatus.addEventListener('click', () => {
+            if (this.soundStatus.classList.contains('sound-on')) {
+                this.soundStatus.classList.remove('sound-on');
+                this.soundStatus.classList.add('sound-off');
+                Object.values(this.sounds).forEach(sound => {
+                    sound.muted = true;
+                });
+            } else {
+                this.soundStatus.classList.remove('sound-off');
+                this.soundStatus.classList.add('sound-on');
+                Object.values(this.sounds).forEach(sound => {
+                    sound.muted = false;
+                });
+            }
+        });
+    }
+    
     // Helper method to play sounds
     playSound(soundName) {
         try {
+            // Check if audio has been initialized
+            if (!this.audioInitialized) {
+                console.log('Audio not initialized yet');
+                return;
+            }
+            
             // Create a new instance to allow for overlapping sounds
             const sound = this.sounds[soundName];
             if (sound) {

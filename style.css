@@ -210,6 +210,23 @@ body::after {
     border-bottom: 2px solid rgba(255, 204, 0, 0.3);
 }
 
+#sound-status {
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+#sound-status.sound-on {
+    opacity: 1;
+    color: #ffcc00;
+    text-shadow: 0 0 8px #ffcc00;
+}
+
+#sound-status.sound-off {
+    opacity: 0.5;
+    color: #999;
+}
+
 .screen {
     position: absolute;
     top: 0;
